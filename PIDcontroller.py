@@ -10,7 +10,7 @@ class PIDController:
         self.error_sum = 0
         self.previous_position = 0
 
-    def updatePosition(plant_error, plant_curr_position):
+    def updatePosition(self, plant_error, plant_curr_position):
 
         # calculate proportional value
         p_val = self.k_proportional * plant_error
@@ -24,4 +24,3 @@ class PIDController:
         self.previous_position = plant_curr_position
 
         return p_val + i_val + d_val
-
