@@ -6,7 +6,7 @@ class Robot:
     def __init__(self):
 
         self.motorLeft = ev3.LargeMotor('outB')
-        self.motorRight = ev3.LargeMotor('outC')
+        self.motorRight = ev3.LargeMotor('outD')
         self.sensorLight = ev3.ColorSensor(ev3.INPUT_1)
         self.sensorLight.mode='COL-REFLECT'
         self.sensorGyro = ev3.GyroSensor(ev3.INPUT_2)

@@ -6,13 +6,15 @@ class LineFollowController(Controller):
     def __init__(self, robot):
         Controller.__init__(self, robot)
 
-        self.PIDCOntroller_light = PIDController(k_proportional=0.7)
+        self.PIDCOntroller_light = PIDController(k_proportional=10.2, k_integral=0.01,k_derivative=0)#30)#, k_integral=0.07, k_derivative=5)
 
         self.light = self.robot.getLightValue()
 
         self.BLACK_LIGHT_VAL = -1#50
         self.WHITE_LIGHT_VAL = -1#40
         self.BASE_DRIVE_POWER = 25
+
+        self.BASE_NORMALISER = -1
 
         self.light_target = -1#(self.BLACK_LIGHT_VAL + self.WHITE_LIGHT_VAL) / 2
 
@@ -24,9 +26,11 @@ class LineFollowController(Controller):
         if self.light_target  == -1:
             self.findLightvalues()
         else:
-            light_error = self.light_target - self.light
-            light_drive = self.PIDCOntroller_light.updatePosition(light_error, self.light)
+            self.light = self.robot.getLightValue()
 
+            light_error = (self.light_target - self.light) / self.BASE_NORMALISER
+            light_drive = self.PIDCOntroller_light.updatePosition(light_error, self.light)
+            print(light_drive)
             self.__drive(light_drive)
 
             self.positionTracer.append(self.robot.getLightValue())
@@ -39,8 +43,8 @@ class LineFollowController(Controller):
 
         while self.robot.getGyroValue() < endGyroVal:
             # drive in a circle
-            self.robot.motorLeft.run_timed(duty_cycle_sp=25, time_sp=500)
-            self.robot.motorRight.run_timed(duty_cycle_sp=-25, time_sp=500)
+            self.robot.motorLeft.run_timed(duty_cycle_sp=25, time_sp=50)
+            self.robot.motorRight.run_timed(duty_cycle_sp=-25, time_sp=50)
 
             # record light values
             lightValuesRange.append(self.robot.getLightValue())
@@ -62,12 +66,13 @@ class LineFollowController(Controller):
         for i in buckets:
             print('{}: {}'.format(i, buckets[i]))
 
-        dBlack = dict(buckets.items()[len(buckets)/2:])
-        dWhite = dict(buckets.items()[:len(buckets)/2])
+        dWhite = dict(buckets.items()[len(buckets)/2:])
+        dBlack = dict(buckets.items()[:len(buckets)/4])
 
         self.WHITE_LIGHT_VAL = max(dWhite, key=dWhite.get)
         self.BLACK_LIGHT_VAL = max(dBlack, key=dBlack.get)
         self.light_target = (self.BLACK_LIGHT_VAL + self.WHITE_LIGHT_VAL) / 2
+        self.BASE_NORMALISER = float((self.WHITE_LIGHT_VAL - self.BLACK_LIGHT_VAL) / 2)
 
         print('final vals: b:{}, w:{}, t:{}'.format(self.BLACK_LIGHT_VAL, self.WHITE_LIGHT_VAL, self.light_target))
 
@@ -84,12 +89,12 @@ class LineFollowController(Controller):
 
     def __drive(self, d_light):
 
-        if d_light > self.BASE_DRIVE_POWER:
-            d_light = self.BASE_DRIVE_POWER
-        elif d_light < -self.BASE_DRIVE_POWER:
-            d_light = -self.BASE_DRIVE_POWER
+        # if d_light > self.BASE_DRIVE_POWER:
+        #     d_light = self.BASE_DRIVE_POWER
+        # elif d_light < -self.BASE_DRIVE_POWER:
+        #     d_light = -self.BASE_DRIVE_POWER
 
-        self.robot.motorLeft.run_timed(duty_cycle_sp=self.BASE_DRIVE_POWER + d_light, time_sp=500)
-        self.robot.motorRight.run_timed(duty_cycle_sp=self.BASE_DRIVE_POWER - d_light, time_sp=500)
+        self.robot.motorLeft.run_timed(duty_cycle_sp=max(-100, min(self.BASE_DRIVE_POWER - d_light, 100)), time_sp=50)
+        self.robot.motorRight.run_timed(duty_cycle_sp=max(-100, min(self.BASE_DRIVE_POWER + d_light, 100)), time_sp=50)
 
-        self.light = self.robot.getLightValue()
+        # self.light = self.robot.getLightValue()
