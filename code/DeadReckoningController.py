@@ -53,11 +53,11 @@ class DeadReckoningController(Controller):
         if yaw_error < 1:
             # then drive to position
             position_error = self.position_target - self.position
-            position_drive = self.PIDController_position.update(position_error, self.position)
+            position_drive = self.PIDController_position.updatePosition(position_error, self.position)
 
             # posX_error =  self.posX_target - self.posX
             # posX_drive = self.PIDController_posX.updatePosition(posX_error, self.posX)
-        
+
             # posY_error =  self.posY_target - self.posY
             # posY_drive = self.PIDController_posY.updatePosition(posY_error, self.posY)
 

@@ -1,4 +1,5 @@
 from DeadReckoningController import DeadReckoningController
+from LineFollowController import LineFollowController
 
 from Controller import Controller
 
@@ -9,8 +10,23 @@ class PlantController(Controller):
 
         self.dead_recController = DeadReckoningController(robot)
 
+        self.line_followController = LineFollowController(robot)
+
     def update(self):
-        self.dead_recController.update()
+
+        # self.dead_recController.update()
+
+        self.line_followController.update()
+
+        lightReadings = ""
+        lightReadings_file = open('lightReadings.txt', 'w')
+
+        for i in range(0, len(self.line_followController.positionTracer)):
+            lightReadings += str(self.line_followController.positionTracer[i]) + ','
+
+        lightReadings_file.write(lightReadings)
+        lightReadings_file.close() # Will write to a text file in a column
+
         # posX, posY, yaw = self.dead_recController.getPosition()
         #
         # # first rotate to the expected rotation
