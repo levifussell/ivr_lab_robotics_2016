@@ -1,13 +1,13 @@
 from DeadReckoningController import DeadReckoningController
 
-class PlantController:
+from Controller import Controller
 
-    def __init__(self, motorLeft, motorRight, sensorGyro):
-        self.motorLeft = motorLeft
-        self.motorRight = motorRight
-        self.sensorGyro = sensorGyro
+class PlantController(Controller):
 
-        self.dead_recController = DeadReckoningController(motorLeft, motorRight, sensorGyro)
+    def __init__(self, robot):
+        Controller.__init__(self, robot)
+
+        self.dead_recController = DeadReckoningController(robot)
 
     def update(self):
         self.dead_recController.update()

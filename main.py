@@ -7,6 +7,7 @@ import time
 import ev3dev.ev3 as ev3
 
 from PlantController import PlantController
+from Robot import Robot
 
 def timestamp_now (): return int (time.time () * 1E3)
 # Local Imports
@@ -21,15 +22,17 @@ def timestamp_now (): return int (time.time () * 1E3)
 # test1.driveWiggleTest()
 # test1.driveAndRecordUltrasonic()
 # test1.controlMain()
-motorB = ev3.LargeMotor('outB')
-motorC = ev3.LargeMotor('outC')
-gyro = ev3.GyroSensor()
-gyro.connected
-gyro.mode = 'GYRO-ANG'
+# motorB = ev3.LargeMotor('outB')
+# motorC = ev3.LargeMotor('outC')
+# gyro = ev3.GyroSensor()
+# gyro.connected
+# gyro.mode = 'GYRO-ANG'
 #
 # startval = gyro.value()
 
-robotPlant = PlantController(motorB, motorC, gyro)
+robot = Robot()
+
+robotPlant = PlantController(robot)#motorB, motorC, gyro)
 robotPlant.newRelativeTarget(30, 9)
 
 t = timestamp_now ()
