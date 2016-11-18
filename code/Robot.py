@@ -7,6 +7,7 @@ class RobotState:
     OBSTACLE_TRACE = 4
     LINE_SEARCH = 5
     OBSTACLE_SCAN = 6
+    OFF_LINE = 7
 
 class Robot:
 

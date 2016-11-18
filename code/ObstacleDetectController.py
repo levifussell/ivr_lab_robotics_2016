@@ -21,7 +21,7 @@ class ObstacleDetectController(Controller):
 
         self.PIDCOntroller_motorSonar = PIDController(k_proportional=4, k_integral=0.05)
 
-        self.PIDCOntroller_sonar = PIDController(k_proportional=40, k_integral=0)
+        self.PIDCOntroller_sonar = PIDController(k_proportional=20, k_integral=0.0005)
 
         self.previousSonarValue = self.robot.getSonarValue()
         self.SONARCHANGE_OBSTVALUE = 200
@@ -104,6 +104,13 @@ class ObstacleDetectController(Controller):
             self.robot.motorLeft.run_timed(duty_cycle_sp=20, time_sp=50)
             self.robot.motorRight.run_timed(duty_cycle_sp=-20, time_sp=50)
 
+            # if self.robot.getSonarValue() < minSonar:
+            #     minSonar = self.robot.getSonarValue()
+            # else:
+            #     distToMin = self.robot.getSonarValue() - minSonar
+
+            # record light values
+
             # record light values
             sonarValuesRange.append(self.robot.getSonarValue())
 
@@ -114,13 +121,20 @@ class ObstacleDetectController(Controller):
 
     def traceObject(self):
 
-        sonar_val = math.log10(float(self.robot.getSonarValue())/2550.0)
-        sonar_error = (math.log10(self.OBJECTSCAN_MIN) - sonar_val) #normalise the ultra value
-        d_sonar = self.PIDCOntroller_sonar.updatePosition(sonar_error, sonar_val)
+        sonar_val = float(self.robot.getSonarValue())/2550.0
+        sonar_val_log = math.log10(sonar_val)
+        sonar_error = math.log10(self.OBJECTSCAN_MIN) - sonar_val_log #normalise the ultra value
+        # print(sonar_error)
+        # pol = 1
+        # if sonar_error < 0:
+        #     pol = -1
+        # if sonar_error != 0:
+        #     sonar_error = math.log10(abs(sonar_error)) * pol
+        d_sonar = self.PIDCOntroller_sonar.updatePosition(sonar_error, sonar_val_log)
         print(d_sonar)
-        baseDrive = 40
+        baseDrive = 55
 
-        self.ultraValues.append(sonar_val)
+        self.ultraValues.append(sonar_val_log)
 
         self.robot.motorLeft.run_timed(duty_cycle_sp=min(max(baseDrive + d_sonar, -100), 100), time_sp=50)
         self.robot.motorRight.run_timed(duty_cycle_sp=min(max(baseDrive - d_sonar, -100), 100), time_sp=50)

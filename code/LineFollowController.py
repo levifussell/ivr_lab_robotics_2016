@@ -3,6 +3,8 @@ from PIDcontroller import PIDController
 
 from Robot import RobotState
 
+import time
+
 class LineFollowController(Controller):
 
     def __init__(self, robot):
@@ -47,6 +49,14 @@ class LineFollowController(Controller):
             self.__drive(light_drive)
 
             self.positionTracer.append(self.robot.getLightValue())
+        elif self.robot.state == RobotState.OBSTACLE_TRACE:
+            if self.robot.getLightValue() - self.BLACK_LIGHT_VAL < 5:
+                self.robot.motorLeft.stop()
+                self.robot.motorRight.stop()
+                time.sleep(1)
+                print('FOUND LINE!')
+                self.robot.setState(RobotState.OFF_LINE)
+                # self.robot.setState(RobotState.LINE_FOLLOW)
 
     def findLightvalues(self):
         lightValuesRange = []
