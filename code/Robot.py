@@ -1,12 +1,10 @@
 import ev3dev.ev3 as ev3
 
-from enum import Enum
-
-class RobotState(Enum):
+class RobotState:
     LINE_COLOUR_EVALUATE = 1
     LINE_FOLLOW = 2
     OBSTACLE_DETECT = 3
-    OBSTACLE_TRAVERSE = 4
+    OBSTACLE_TRACE = 4
     LINE_SEARCH = 5
     OBSTACLE_SCAN = 6
 
@@ -20,9 +18,13 @@ class Robot:
         self.sensorLight = ev3.ColorSensor(ev3.INPUT_1)
         self.sensorLight.mode='COL-REFLECT'
         self.sensorGyro = ev3.GyroSensor(ev3.INPUT_2)
-        # self.sensorSonar = ev3.SonarSensor()
+        self.sensorSonar = ev3.UltrasonicSensor(ev3.INPUT_3)
         self.sensorGyro.mode = 'GYRO-ANG'
+        self.sensorTouch = ev3.TouchSensor(ev3.INPUT_4)
         self.state = RobotState.LINE_COLOUR_EVALUATE
+
+        self.motorMiddleStartPosition = self.motorMiddle.position
+        self.sensorGyroStartValue = self.sensorGyro.value()
 
     def driveMotors(self, powerLeft, powerRight, powerMiddle):
         self.driveLeftMotor(powerLeft)
@@ -39,7 +41,7 @@ class Robot:
         self.motorRight.run_timed(duty_cycle_sp=power, time_sp=50)
 
     def driveMiddleMotor(self, power):
-        self.motorMiddle.run_timed(duty_cycle_sp=power, time_sp=50)
+        self.motorMiddle.run_direct(duty_cycle_sp=power)
 
     def getLightValue(self):
         return self.sensorLight.value()
@@ -47,8 +49,11 @@ class Robot:
     def getGyroValue(self):
         return self.sensorGyro.value()
 
-    # def getSonarValue(self):
-    #     return self.sensorSonar.value()
+    def getSonarValue(self):
+        return self.sensorSonar.value()
+
+    def getTouchValue(self):
+        return self.sensorTouch.value()
 
     def getMainAvgEncoderValue(self):
         return (self.motorLeft.position + self.motorRight.position) / 2

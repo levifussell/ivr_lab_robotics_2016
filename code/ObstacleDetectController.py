@@ -1,9 +1,12 @@
 from Controller import Controller
+from PIDcontroller import PIDController
 from DeadReckoningController import DeadReckoningController
 
 from Robot import RobotState
 
-from enum import Enum
+import time
+
+import math
 
 # class ObstacleScanDirection(Enum):
 #     LEFT = 1
@@ -11,55 +14,117 @@ from enum import Enum
 
 class ObstacleDetectController(Controller):
 
-    def __init__(self, robot)RobotState:
+    def __init__(self, robot):
         Controller.__init__(self, robot)
 
         self.deadRec_controller = DeadReckoningController(robot)
 
-        self.PIDCOntroller_motorSonar = PIDController()
+        self.PIDCOntroller_motorSonar = PIDController(k_proportional=4, k_integral=0.05)
+
+        self.PIDCOntroller_sonar = PIDController(k_proportional=40, k_integral=0)
 
         self.previousSonarValue = self.robot.getSonarValue()
-        self.SONARCHANGE_OBSTVALUE = 20
+        self.SONARCHANGE_OBSTVALUE = 200
+        self.OBJECTSCAN_MIN = -1
+
+        self.ultraValues = []
+
         # self.scanDirection = ObstacleScanDirection.LEFT
         # self.scanLeftValue = -1
         # self.scanRightValue = -1
 
+    def timestamp_now (self): return int (time.time () * 1E3)
+
     def update(self):
 
         # always update the dead reckoning controller
-        self.deadRec_controller.update()
+        # self.deadRec_controller.update()
 
-        # check if the ultrasonic has changed dramatically 
-        if (abs(self.robot.getSonarValue() - self.previousSonarValue) < self.SONARCHANGE_OBSTVALUE) and (self.robot.setState != RobotState.OBSTACLE_DETECT):
-            # object detected
-            self.robot.setState = RobotState.OBSTACLE_DETECT
+        # check if the ultrasonic has changed dramatically
+        if self.robot.state == RobotState.LINE_FOLLOW:
+            diffSonar = abs(self.robot.getSonarValue() - self.previousSonarValue)
+            # print(self.robot.getSonarValue())
+            if self.robot.getSonarValue() < 100:#(diffSonar > self.SONARCHANGE_OBSTVALUE):
+                # object detected
+                self.robot.setState(RobotState.OBSTACLE_DETECT)
+                self.robot.motorLeft.stop()
+                self.robot.motorRight.stop()
 
-        if self.robot.state == RobotState.OBSTACLE_DETECT:
-            d_middle = 0
+                # t_start = self.timestamp_now()
+                # # set motor middle to starting value
+                # while self.timestamp_now() - t_start < 3000:
+                #     middle_error = self.robot.motorMiddleStartPosition - self.robot.motorMiddle.position
+                #     d_middle = self.PIDCOntroller_motorSonar.updatePosition(middle_error, self.robot.motorMiddle.position)
+                #     self.__drive(d_middle)
+                #     # self.robot.motorMiddle.run_direct(duty_cycle_sp=diff_to)
+                #     # diff_to = self.robot.motorMiddleStartPosition - self.robot.motorMiddle.position
+                #     print(d_middle)
 
-            targetOffset = 0
-            if self.scanDirection == ObstacleScanDirection.LEFT:
-                # move ultrasonic to the right and detect
-                targetOffset = 90 #encoder value that corresponds to 90 degrees (TODO)
-            elif self.scanDirection == ObstacleScanDirection.RIGHT:
-                # move ultrasonic to the left and detect
-                targetOffset = -90 #encoder value that corresponds to -90 degrees (TODO)
+                    # if abs(middle_error) < 1:
+                    #     break
 
-            targetTurn = self.robot.getMiddleAvgEncoderValue() + targetOffset 
-            turn_error = targetTurn - self.robot.getMiddleEncoderValue()
-            d_middle = self.PIDCOntroller_motorSonar(turn_error, self.robot.getMiddleEncoderValue())
+                driveSpeed = 100
+                t_start = self.timestamp_now()
+                while self.timestamp_now() - t_start < 1000:
 
-            if turn_error < 1:
-                if self.scanDirection == ObstacleScanDirection.LEFT:
-                    self.scanLeftValue = self.robot.getSonarValue()
-                    self.scanDirection = ObstacleScanDirection.RIGHT
-                elif self.scanDirection == ObstacleScanDirection.RIGHT:
-                    self.scanRightValue = self.robot.getSonarValue()
+                    self.robot.motorMiddle.run_direct(duty_cycle_sp=driveSpeed)
 
-            self.__drive(d_middle)
+                    if self.robot.getTouchValue():
+                        driveSpeed *= 0.9
+
+                    if driveSpeed < 4:
+                        break
+
+                self.robot.motorMiddle.stop()
+                self.robot.setState(RobotState.OBSTACLE_SCAN)
+                print('settled')
+
+                self.previousSonarValue = self.robot.getSonarValue()
+
+        elif self.robot.state == RobotState.OBSTACLE_SCAN:
+            self.scanObject()
+
+        elif self.robot.state == RobotState.OBSTACLE_TRACE:
+            self.traceObject()
+                # set robot to 90 degree orientation
+                # endGyroVal = self.robot.getGyroValue() + 360
+                #
+                # while self.robot.getGyroValue() < endGyroVal:
+                #     # drive in a circle
+                #     self.robot.motorLeft.run_timed(duty_cycle_sp=25, time_sp=50)
+                #     self.robot.motorRight.run_timed(duty_cycle_sp=-25, time_sp=50)
+
+    def scanObject(self):
+
+        endGyroVal = self.robot.getGyroValue() + 120
+        sonarValuesRange = []
+
+        while self.robot.getGyroValue() < endGyroVal:
+            # drive in a circle
+            self.robot.motorLeft.run_timed(duty_cycle_sp=20, time_sp=50)
+            self.robot.motorRight.run_timed(duty_cycle_sp=-20, time_sp=50)
+
+            # record light values
+            sonarValuesRange.append(self.robot.getSonarValue())
+
+        self.OBJECTSCAN_MIN = float(min(sonarValuesRange))/2550.0
+
+        print('min sonar value:{}'.format(self.OBJECTSCAN_MIN))
+        self.robot.setState(RobotState.OBSTACLE_TRACE)
+
+    def traceObject(self):
+
+        sonar_val = math.log10(float(self.robot.getSonarValue())/2550.0)
+        sonar_error = (math.log10(self.OBJECTSCAN_MIN) - sonar_val) #normalise the ultra value
+        d_sonar = self.PIDCOntroller_sonar.updatePosition(sonar_error, sonar_val)
+        print(d_sonar)
+        baseDrive = 40
+
+        self.ultraValues.append(sonar_val)
+
+        self.robot.motorLeft.run_timed(duty_cycle_sp=min(max(baseDrive + d_sonar, -100), 100), time_sp=50)
+        self.robot.motorRight.run_timed(duty_cycle_sp=min(max(baseDrive - d_sonar, -100), 100), time_sp=50)
 
     def __drive(self, d_middle):
 
-        self.robot.motorMiddle.run_timed(duty_cycle_sp=d_middle, time_sp=50)
-
-    
+        self.robot.motorMiddle.run_direct(duty_cycle_sp=min(max(d_middle, -100), 100))

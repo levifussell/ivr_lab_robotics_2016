@@ -33,7 +33,7 @@ class DeadReckoningController(Controller):
 
         # define starting position of robot as origin
         self.yaw = self.robot.getGyroValue()
-        self.position = self.robot.getAvgEncoderValue()
+        self.position = self.robot.getMainAvgEncoderValue()
 
     def update(self):
 
@@ -104,7 +104,7 @@ class DeadReckoningController(Controller):
         self.yaw = self.robot.getGyroValue()
 
         # update the current position to the sensor value of the robot
-        self.position = self.robot.getAvgEncoderValue()
+        self.position = self.robot.getMainAvgEncoderValue()
 
         # display current values for debugging
         print('yaw:{}, position:{}'.format(self.yaw, self.position))

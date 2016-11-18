@@ -26,10 +26,10 @@ class PlantController(Controller):
         self.obstacle_detectController.update()
 
         lightReadings = ""
-        lightReadings_file = open('lightReadings.txt', 'w')
+        lightReadings_file = open('ultraReadings.txt', 'w')
 
-        for i in range(0, len(self.line_followController.positionTracer)):
-            lightReadings += str(self.line_followController.positionTracer[i]) + ','
+        for i in range(0, len(self.obstacle_detectController.ultraValues)):
+            lightReadings += str(self.obstacle_detectController.ultraValues[i]) + ','
 
         lightReadings_file.write(lightReadings)
         lightReadings_file.close() # Will write to a text file in a column

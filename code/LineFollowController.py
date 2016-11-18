@@ -8,7 +8,11 @@ class LineFollowController(Controller):
     def __init__(self, robot):
         Controller.__init__(self, robot)
 
-        self.PIDCOntroller_light = PIDController(k_proportional=10.2, k_integral=0.01,k_derivative=0)#30)#, k_integral=0.07, k_derivative=5)
+        self.PIDCOntroller_light = PIDController(k_proportional=15.2, k_integral=0.02,k_derivative=0)#30)#, k_integral=0.07, k_derivative=5)
+        # self.PIDCOntroller_light = PIDController(k_proportional=10.2, k_integral=0.01,k_derivative=0)#30)#, k_integral=0.07, k_derivative=5)
+
+        self.PIDCOntroller_motorMiddle = PIDController(k_proportional=0.7)
+        # self.startMotorMiddle = self.robot.motorMiddle.position
 
         self.light = self.robot.getLightValue()
 
@@ -25,14 +29,21 @@ class LineFollowController(Controller):
     def update(self):
 
         # if the black/white light values have not been set, search for them
-        if self.robot.state = RobotState.LINE_COLOUR_EVALUATE: #self.light_target  == -1:
+        if self.robot.state == RobotState.LINE_COLOUR_EVALUATE: #self.light_target  == -1:
             self.findLightvalues()
-        elif self.robot.state = RobotState.LINE_FOLLOW:
-            self.light = self.robot.getLightValue()
+        elif self.robot.state == RobotState.LINE_FOLLOW:
+            #TODO: fix light sensor values after uncommenting to fix this bug
+            self.light = self.robot.getLightValue() # / self.BASE_NORMALISER
 
             light_error = (self.light_target - self.light) / self.BASE_NORMALISER
             light_drive = self.PIDCOntroller_light.updatePosition(light_error, self.light)
-            print(light_drive)
+
+            motorMiddleError = (self.robot.motorMiddleStartPosition + light_drive*3) - self.robot.motorMiddle.position
+            middle_drive = self.PIDCOntroller_motorMiddle.updatePosition(motorMiddleError, self.robot.motorMiddle.position)
+            # print(middle_drive)
+            self.robot.motorMiddle.run_direct(duty_cycle_sp=min(100, max(middle_drive, -100)))
+
+            # print(light_drive)
             self.__drive(light_drive)
 
             self.positionTracer.append(self.robot.getLightValue())

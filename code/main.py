@@ -36,7 +36,7 @@ robotPlant = PlantController(robot)#motorB, motorC, gyro)
 robotPlant.newRelativeTarget(30, 9)
 
 t = timestamp_now ()
-while timestamp_now () - t < 45000:
+while timestamp_now () - t < 20000:
     robotPlant.update()
 
 # motorB.run_timed(duty_cycle_sp=50, time_sp=2000)
