@@ -1,7 +1,10 @@
 from DeadReckoningController import DeadReckoningController
 from LineFollowController import LineFollowController
+from ObstacleDetectController import ObstacleDetectController
 
 from Controller import Controller
+
+from Robot import RobotState
 
 class PlantController(Controller):
 
@@ -12,11 +15,15 @@ class PlantController(Controller):
 
         self.line_followController = LineFollowController(robot)
 
+        self.obstacle_detectController = ObstacleDetectController(robot)
+
     def update(self):
 
         # self.dead_recController.update()
 
         self.line_followController.update()
+
+        self.obstacle_detectController.update()
 
         lightReadings = ""
         lightReadings_file = open('lightReadings.txt', 'w')

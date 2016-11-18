@@ -1,6 +1,8 @@
 from Controller import Controller
 from PIDcontroller import PIDController
 
+from Robot import RobotState
+
 class LineFollowController(Controller):
 
     def __init__(self, robot):
@@ -23,9 +25,9 @@ class LineFollowController(Controller):
     def update(self):
 
         # if the black/white light values have not been set, search for them
-        if self.light_target  == -1:
+        if self.robot.state = RobotState.LINE_COLOUR_EVALUATE: #self.light_target  == -1:
             self.findLightvalues()
-        else:
+        elif self.robot.state = RobotState.LINE_FOLLOW:
             self.light = self.robot.getLightValue()
 
             light_error = (self.light_target - self.light) / self.BASE_NORMALISER
@@ -86,6 +88,8 @@ class LineFollowController(Controller):
         # self.WHITE_LIGHT_VAL = maxWhite
         # self.BLACK_LIGHT_VAL = maxBlack
         # self.light_target = (self.BLACK_LIGHT_VAL + self.WHITE_LIGHT_VAL) / 2
+
+        self.robot.setState(RobotState.LINE_FOLLOW)
 
     def __drive(self, d_light):
 
