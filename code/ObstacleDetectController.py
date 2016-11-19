@@ -21,7 +21,9 @@ class ObstacleDetectController(Controller):
 
         self.PIDCOntroller_motorSonar = PIDController(k_proportional=4, k_integral=0.05)
 
+        # FOR LOG (BEST RUN)
         self.PIDCOntroller_sonar = PIDController(k_proportional=20, k_integral=0.0005)
+        # self.PIDCOntroller_sonar = PIDController(k_proportional=40, k_integral=0.001)
 
         self.previousSonarValue = self.robot.getSonarValue()
         self.SONARCHANGE_OBSTVALUE = 200
@@ -44,7 +46,7 @@ class ObstacleDetectController(Controller):
         if self.robot.state == RobotState.LINE_FOLLOW:
             diffSonar = abs(self.robot.getSonarValue() - self.previousSonarValue)
             # print(self.robot.getSonarValue())
-            if self.robot.getSonarValue() < 100:#(diffSonar > self.SONARCHANGE_OBSTVALUE):
+            if self.robot.getSonarValue() < 60:#(diffSonar > self.SONARCHANGE_OBSTVALUE):
                 # object detected
                 self.robot.setState(RobotState.OBSTACLE_DETECT)
                 self.robot.motorLeft.stop()
@@ -96,7 +98,7 @@ class ObstacleDetectController(Controller):
 
     def scanObject(self):
 
-        endGyroVal = self.robot.getGyroValue() + 120
+        endGyroVal = self.robot.getGyroValue() + 100
         sonarValuesRange = []
 
         while self.robot.getGyroValue() < endGyroVal:

@@ -1,7 +1,7 @@
+#! /usr/bin/env python
+
 # scp -r Documents/ivr_2016/robotics/tests/ivr_robotics/ robot@192.168.17.129:~/
 
-
-#! /usr/bin/env python
 # Core imports
 import time
 import ev3dev.ev3 as ev3
@@ -9,7 +9,10 @@ import ev3dev.ev3 as ev3
 from PlantController import PlantController
 from Robot import Robot
 
+import utilities
+
 def timestamp_now (): return int (time.time () * 1E3)
+
 # Local Imports
 # import openLoopControl as olc
 
@@ -33,11 +36,25 @@ def timestamp_now (): return int (time.time () * 1E3)
 robot = Robot()
 
 robotPlant = PlantController(robot)#motorB, motorC, gyro)
-robotPlant.newRelativeTarget(30, 9)
+robotPlant.newRelativeTarget(10, 10)
 
 t = timestamp_now ()
-while timestamp_now () - t < 20000:
+
+btn = ev3.Button()
+
+while (timestamp_now () - t < 45000) and (not btn.backspace):
     robotPlant.update()
+
+lightReadings = ""
+lightReadings_file = open('lightError2.txt', 'w')
+
+for i in range(0, len(robotPlant.line_followController.positionTracer)):
+    lightReadings += str(robotPlant.line_followController.positionTracer[i]) + ','
+
+lightReadings_file.write(lightReadings)
+lightReadings_file.close() # Will write to a text file in a column
+
+
 
 # motorB.run_timed(duty_cycle_sp=50, time_sp=2000)
 # motorB_startPos = motorB.position

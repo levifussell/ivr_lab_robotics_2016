@@ -8,6 +8,7 @@ class PIDController:
         # self.kI_min = 0.0001
         self.k_derivative = k_derivative
         self.error_sum = 0
+        self.error_derivative = 0
         self.previous_position = 0
 
     def updatePosition(self, plant_error, plant_curr_position):
@@ -20,7 +21,8 @@ class PIDController:
         i_val = self.k_integral * self.error_sum
 
         # calculate derivative value
-        d_val = self.k_derivative * (plant_curr_position - self.previous_position)
+        self.error_derivative = (plant_curr_position - self.previous_position)
+        d_val = self.k_derivative * self.error_derivative
         self.previous_position = plant_curr_position
 
         return p_val + i_val + d_val
