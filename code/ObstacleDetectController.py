@@ -26,7 +26,7 @@ class ObstacleDetectController(Controller):
         # self.PIDCOntroller_sonar = PIDController(k_proportional=40, k_integral=0.001)
 
         self.previousSonarValue = self.robot.getSonarValue()
-        self.SONARCHANGE_OBSTVALUE = 200
+        # self.SONARCHANGE_OBSTVALUE = 200
         self.OBJECTSCAN_MIN = -1
 
         self.ultraValues = []
@@ -126,6 +126,11 @@ class ObstacleDetectController(Controller):
         sonar_val = float(self.robot.getSonarValue())/2550.0
         sonar_val_log = math.log10(sonar_val)
         sonar_error = math.log10(self.OBJECTSCAN_MIN) - sonar_val_log #normalise the ultra value
+
+        # edge case if the sonar value reads 255cm
+        if sonar_val >= 1:
+            sonar_error = 0
+
         # print(sonar_error)
         # pol = 1
         # if sonar_error < 0:

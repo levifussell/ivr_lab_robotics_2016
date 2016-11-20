@@ -99,9 +99,10 @@ class LineFollowController(Controller):
         endGyroVal = self.robot.getGyroValue() + 340
 
         # start robot on black line always
-        startBlack = self.robot.getLightValue()
-
-        while self.robot.getGyroValue() < endGyroVal or abs(self.robot.getLightValue() - startBlack) > 1:
+        # startBlack = self.robot.getLightValue()
+        prevLightVal = self.robot.getLightValue()
+        itter = 0
+        while self.robot.getGyroValue() < endGyroVal or (prevLightVal - self.robot.getLightValue()) < 3:
             print( self.robot.getLightValue())
             # drive in a circle
             self.robot.motorLeft.run_timed(duty_cycle_sp=40, time_sp=50)
@@ -109,6 +110,10 @@ class LineFollowController(Controller):
 
             # record light values
             lightValuesRange.append(self.robot.getLightValue())
+
+            itter += 1
+            if itter % 2 == 0:
+                prevLightVal = self.robot.getLightValue()
 
         # for i in range(0, len(lightValuesRange)):
         #     print(lightValuesRange)
