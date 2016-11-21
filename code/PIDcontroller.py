@@ -1,15 +1,15 @@
 
 class PIDController:
 
-    def __init__(self, k_proportional=1, k_integral=0, k_derivative=0):
+    def __init__(self, k_proportional=1.0, k_integral=0.0, k_derivative=0.0):
         self.k_proportional = k_proportional
         self.k_integral = k_integral
         # self.kI_max = 2
         # self.kI_min = 0.0001
         self.k_derivative = k_derivative
-        self.error_sum = 0
-        self.error_derivative = 0
-        self.previous_position = 0
+        self.error_sum = 0.0
+        self.error_derivative = 0.0
+        self.previous_position = 0.0
 
     def updatePosition(self, plant_error, plant_curr_position):
 

@@ -71,16 +71,18 @@ class LineFollowController(Controller):
             #
             # print(self.negErrorStreak)
 
-            off_edge_const = 25
-            if (light_drive < -off_edge_const and self.lineFollowPolarity == 1) or (light_drive > off_edge_const and self.lineFollowPolarity == -1):
-                self.resetPIDs()
-                self.lineFollowPolarity *= -1
-                self.robot.setState(RobotState.OFF_LINE)
-                self.robot.motorLeft.stop()
-                self.robot.motorRight.stop()
-                self.robot.motorMiddle.stop()
-                print('OFFLINE!!!!!')
-                time.sleep(2)
+# UNCOMMENT FOR OFF LINE DETECTION-------------------------------------
+            # off_edge_const = 23
+            # if (light_drive < -off_edge_const and self.lineFollowPolarity == 1) or (light_drive > off_edge_const and self.lineFollowPolarity == -1):
+            #     self.resetPIDs()
+            #     self.lineFollowPolarity *= -1
+            #     self.robot.setState(RobotState.OFF_LINE)
+            #     self.robot.motorLeft.stop()
+            #     self.robot.motorRight.stop()
+            #     self.robot.motorMiddle.stop()
+            #     print('OFFLINE!!!!!')
+            #     time.sleep(2)
+# UNCOMMENT FOR OFF LINE DETECTION-------------------------------------
 
             # self.positionTracer.append(self.robot.getLightValue())
         elif self.robot.state == RobotState.OBSTACLE_TRACE:

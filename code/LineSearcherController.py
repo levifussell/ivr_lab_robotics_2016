@@ -105,10 +105,15 @@ class LineSearcherController(Controller):
                 self.robot.motorRight.stop()
                 self.robot.motorMiddle.stop()
                 print('FOUND NEW LINE')
-                targetDegree = self.robot.getGyroValue() - 75
+                targetDegree = self.robot.sensorGyroStartValue
                 print(targetDegree)
+
+                self.robot.motorLeft.run_timed(duty_cycle_sp=50, time_sp=300)
+                self.robot.motorRight.run_timed(duty_cycle_sp=50, time_sp=300)
+                time.sleep(1)
+
                 # aim to the right
-                while True:
+                while True:#(self.previousLightVal - self.robot.getLightValue()) > -3:
                     d_error = float(targetDegree - self.robot.getGyroValue())
                     d_turn = self.turn_PID.updatePosition(d_error, self.robot.getGyroValue())
 
@@ -119,22 +124,29 @@ class LineSearcherController(Controller):
                         self.robot.motorLeft.run_timed(duty_cycle_sp=-25, time_sp=50)
                         self.robot.motorRight.run_timed(duty_cycle_sp=25, time_sp=50)
 
-
+                    self.previousLightVal = self.robot.getLightValue()
                     # if abs(d_error) < 5:
                     # self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and
                     if abs(d_error) < 5:
                         self.lineState = LineState.RIGHT
+                        self.robot.setState(RobotState.LINE_FOLLOW)
                         break
+
             elif self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.RIGHT and (self.previousLightVal - self.robot.getLightValue()) < -3:
                 self.robot.setState(RobotState.LINE_FOLLOW)
                 self.robot.motorLeft.stop()
                 self.robot.motorRight.stop()
                 self.robot.motorMiddle.stop()
                 print('FOUND NEW LINE')
-                targetDegree = self.robot.getGyroValue() + 75
+                targetDegree = self.robot.sensorGyroStartValue
                 print(targetDegree)
+
+                self.robot.motorLeft.run_timed(duty_cycle_sp=50, time_sp=300)
+                self.robot.motorRight.run_timed(duty_cycle_sp=50, time_sp=300)
+                time.sleep(1)
+
                 # aim to the right
-                while True:
+                while True:#(self.previousLightVal - self.robot.getLightValue()) > -3:
                     d_error = float(targetDegree - self.robot.getGyroValue())
                     d_turn = self.turn_PID.updatePosition(d_error, self.robot.getGyroValue())
 
@@ -145,15 +157,15 @@ class LineSearcherController(Controller):
                         self.robot.motorLeft.run_timed(duty_cycle_sp=-25, time_sp=50)
                         self.robot.motorRight.run_timed(duty_cycle_sp=25, time_sp=50)
 
-
+                    self.previousLightVal = self.robot.getLightValue()
                     # if abs(d_error) < 5:
                     # self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and
                     if abs(d_error) < 5:
                         self.lineState = LineState.LEFT
+                        self.robot.setState(RobotState.LINE_FOLLOW)
                         break
 
                     # self.previousLightVal = self.robot.getLightValue()
-                    self.robot.setState(RobotState.LINE_FOLLOW)
                 # self.robot.setState(RobotState.LINE_FOLLOW)
 
             else:

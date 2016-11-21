@@ -42,7 +42,7 @@ t = timestamp_now ()
 
 btn = ev3.Button()
 
-while (timestamp_now () - t < 45000) and (not btn.backspace):
+while (timestamp_now () - t < 60000) and (not btn.backspace):
     robotPlant.update()
 
 lightReadings = ""
