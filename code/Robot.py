@@ -7,6 +7,8 @@ class RobotState:
     OBSTACLE_TRACE = 4
     LINE_SEARCH = 5
     OBSTACLE_SCAN = 6
+    OFF_LINE = 7
+    DEAD = 8 # for debug purposes
 
 class Robot:
 
@@ -24,7 +26,11 @@ class Robot:
         self.state = RobotState.LINE_COLOUR_EVALUATE
 
         self.motorMiddleStartPosition = self.motorMiddle.position
-        self.sensorGyroStartValue = self.sensorGyro.value()
+        self.sensorGyroStartValue = self.sensorGyro.value() + 360
+
+        self.LIGHT_BLACK_VAL = -1
+        self.LIGHT_WHITE_VAL = -1
+        self.LIGHT_MID_VAL = -1
 
     def driveMotors(self, powerLeft, powerRight, powerMiddle):
         self.driveLeftMotor(powerLeft)
