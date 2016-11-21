@@ -112,7 +112,7 @@ class LineSearcherController(Controller):
                 self.robot.motorRight.run_timed(duty_cycle_sp=50, time_sp=300)
                 time.sleep(1)
 
-                # aim to the right
+                # turn to face middle
                 while True:#(self.previousLightVal - self.robot.getLightValue()) > -3:
                     d_error = float(targetDegree - self.robot.getGyroValue())
                     d_turn = self.turn_PID.updatePosition(d_error, self.robot.getGyroValue())
@@ -145,7 +145,7 @@ class LineSearcherController(Controller):
                 self.robot.motorRight.run_timed(duty_cycle_sp=50, time_sp=300)
                 time.sleep(1)
 
-                # aim to the right
+                # turn to face middle
                 while True:#(self.previousLightVal - self.robot.getLightValue()) > -3:
                     d_error = float(targetDegree - self.robot.getGyroValue())
                     d_turn = self.turn_PID.updatePosition(d_error, self.robot.getGyroValue())
