@@ -47,7 +47,8 @@ class ObstacleDetectController(Controller):
         if self.robot.state == RobotState.LINE_FOLLOW:
             diffSonar = abs(self.robot.getSonarValue() - self.previousSonarValue)
             # print(self.robot.getSonarValue())
-            if self.robot.getSonarValue() < 40:#(diffSonar > self.SONARCHANGE_OBSTVALUE):
+            if self.robot.getSonarValue() < 50:
+            # if self.robot.getSonarValue() < 40:#(diffSonar > self.SONARCHANGE_OBSTVALUE):
                 # object detected
                 self.robot.setState(RobotState.OBSTACLE_DETECT)
                 self.robot.motorLeft.stop()
@@ -104,8 +105,8 @@ class ObstacleDetectController(Controller):
 
         while self.robot.getGyroValue() < endGyroVal:
             # drive in a circle
-            self.robot.motorLeft.run_timed(duty_cycle_sp=20, time_sp=50)
-            self.robot.motorRight.run_timed(duty_cycle_sp=-20, time_sp=50)
+            self.robot.motorLeft.run_timed(duty_cycle_sp=30, time_sp=50)
+            self.robot.motorRight.run_timed(duty_cycle_sp=-30, time_sp=50)
 
             # if self.robot.getSonarValue() < minSonar:
             #     minSonar = self.robot.getSonarValue()
@@ -145,7 +146,8 @@ class ObstacleDetectController(Controller):
         #     sonar_error = math.log10(abs(sonar_error)) * pol
         d_sonar = self.PIDCOntroller_sonar.updatePosition(sonar_error, sonar_val_log)
         print(sonar_val * 2550.0)
-        baseDrive = 28
+        baseDrive = 32
+        # baseDrive = 28
 
         self.ultraValues.append(sonar_val_log)
 

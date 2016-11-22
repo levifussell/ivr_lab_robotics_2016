@@ -7,7 +7,7 @@ import time
 
 class LineFollowController(Controller):
 
-    def __init__(self, robot):
+    def __init__(self, robot, actWhenOffLine=True, lineSensitivity=23):
         Controller.__init__(self, robot)
 
         self.PIDCOntroller_light = None #PIDController(k_proportional=12.2, k_integral=0.52, k_derivative=0.0)#30)#, k_integral=0.07, k_derivative=5)
@@ -33,6 +33,11 @@ class LineFollowController(Controller):
         self.negErrorStreak = 0
 
         self.lineFollowPolarity = 1
+
+        # do something when off the line
+        self.actWhenOffLine = actWhenOffLine
+
+        self.lineSensitivity = lineSensitivity
 
     def resetPIDs(self):
 
@@ -72,26 +77,28 @@ class LineFollowController(Controller):
             # print(self.negErrorStreak)
 
 # UNCOMMENT FOR OFF LINE DETECTION-------------------------------------
-            # off_edge_const = 23
-            # if (light_drive < -off_edge_const and self.lineFollowPolarity == 1) or (light_drive > off_edge_const and self.lineFollowPolarity == -1):
-            #     self.resetPIDs()
-            #     self.lineFollowPolarity *= -1
-            #     self.robot.setState(RobotState.OFF_LINE)
-            #     self.robot.motorLeft.stop()
-            #     self.robot.motorRight.stop()
-            #     self.robot.motorMiddle.stop()
-            #     print('OFFLINE!!!!!')
-            #     time.sleep(2)
+            if self.actWhenOffLine:
+                # constant at value of 23
+                off_edge_const = self.lineSensitivity
+                if (light_drive < -off_edge_const and self.lineFollowPolarity == 1) or (light_drive > off_edge_const and self.lineFollowPolarity == -1):
+                    self.resetPIDs()
+                    self.lineFollowPolarity *= -1
+                    self.robot.setState(RobotState.OFF_LINE)
+                    self.robot.motorLeft.stop()
+                    self.robot.motorRight.stop()
+                    self.robot.motorMiddle.stop()
+                    print('OFFLINE!!!!!')
+                    time.sleep(2)
 # UNCOMMENT FOR OFF LINE DETECTION-------------------------------------
 
             # self.positionTracer.append(self.robot.getLightValue())
-        elif self.robot.state == RobotState.OBSTACLE_TRACE:
-            if self.robot.getLightValue() - self.BLACK_LIGHT_VAL < 5:
-                self.robot.motorLeft.stop()
-                self.robot.motorRight.stop()
-                time.sleep(1)
-                print('FOUND LINE!')
-                self.robot.setState(RobotState.DEAD)
+        # elif self.robot.state == RobotState.OBSTACLE_TRACE:
+        #     if self.robot.getLightValue() - self.BLACK_LIGHT_VAL < 5:
+        #         self.robot.motorLeft.stop()
+        #         self.robot.motorRight.stop()
+        #         time.sleep(1)
+        #         print('FOUND LINE!')
+        #         self.robot.setState(RobotState.DEAD)
                 # self.robot.setState(RobotState.LINE_FOLLOW)
 
     def findLightvalues(self):

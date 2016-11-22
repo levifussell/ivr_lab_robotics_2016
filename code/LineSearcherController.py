@@ -20,6 +20,8 @@ class LineSearcherController(Controller):
 
         # always start on the leftmost line
         self.lineState = LineState.RIGHT
+        # number of times the robot has moved between a line
+        self.numLinesMoved = 0
 
         # get the initial angle of the robot so we can
         #  turn 90dgrs relative to this
@@ -88,7 +90,7 @@ class LineSearcherController(Controller):
             self.robot.setState(RobotState.LINE_SEARCH)
             self.previousLightVal = self.robot.getLightValue()
 
-        elif self.robot.state == RobotState.LINE_SEARCH:
+        elif self.robot.state == RobotState.LINE_SEARCH or self.robot.state == RobotState.OBSTACLE_TRACE:
 
             # check for drastic change in light
             # print(abs(self.previousLightVal - self.robot.getLightValue()))
@@ -130,6 +132,9 @@ class LineSearcherController(Controller):
                     if abs(d_error) < 5:
                         self.lineState = LineState.RIGHT
                         self.robot.setState(RobotState.LINE_FOLLOW)
+
+                        # add a line to the line count
+                        self.numLinesMoved += 1
                         break
 
             elif self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.RIGHT and (self.previousLightVal - self.robot.getLightValue()) < -3:
@@ -163,6 +168,9 @@ class LineSearcherController(Controller):
                     if abs(d_error) < 5:
                         self.lineState = LineState.LEFT
                         self.robot.setState(RobotState.LINE_FOLLOW)
+
+                        # add a line to the line count
+                        self.numLinesMoved += 1
                         break
 
                     # self.previousLightVal = self.robot.getLightValue()

@@ -7,31 +7,47 @@ from Controller import Controller
 
 from Robot import RobotState
 
+import time
+
 class PlantController(Controller):
 
-    def __init__(self, robot):
+    def __init__(self, robot, useLineFollow=True, useLineSearch=True, useObstacleDetect=True, actWhenOffLine=True, lineSensitivity=23):
         Controller.__init__(self, robot)
 
-        self.dead_recController = DeadReckoningController(robot)
+        # self.dead_recController = DeadReckoningController(robot)
 
-        self.line_followController = LineFollowController(robot)
+        self.useLineFollow = useLineFollow
+        self.useLineSearch = useLineSearch
+        self.useObstacleDetect = useObstacleDetect
 
-        self.line_searchController = LineSearcherController(robot)
+        if self.useLineFollow:
+            self.line_followController = LineFollowController(robot, actWhenOffLine=actWhenOffLine, lineSensitivity=lineSensitivity)
 
-        self.obstacle_detectController = ObstacleDetectController(robot)
+        if self.useLineSearch:
+            self.line_searchController = LineSearcherController(robot)
+
+        if self.useObstacleDetect:
+            self.obstacle_detectController = ObstacleDetectController(robot)
+
+    def timestamp_now (self): return int (time.time () * 1E3)
 
     def update(self):
 
         # self.dead_recController.update()
 
 
+        if self.useLineFollow:
+            self.line_followController.update()
 
-        self.line_followController.update()
+        if self.useLineSearch:
+            self.line_searchController.update()
 
-        self.line_searchController.update()
+        if self.useObstacleDetect:
+            self.obstacle_detectController.update()
 
-        self.obstacle_detectController.update()
 
+    def taskOver(self):
+        return self.robot.state == RobotState.DEAD
 
         # posX, posY, yaw = self.dead_recController.getPosition()
         #
@@ -41,5 +57,5 @@ class PlantController(Controller):
 
         # then drive to position
 
-    def newRelativeTarget(self, d_x, d_y):
-        self.dead_recController.newRelativeTarget(d_x, d_y)
+    # def newRelativeTarget(self, d_x, d_y):
+    #     self.dead_recController.newRelativeTarget(d_x, d_y)

@@ -36,13 +36,13 @@ def timestamp_now (): return int (time.time () * 1E3)
 robot = Robot()
 
 robotPlant = PlantController(robot)#motorB, motorC, gyro)
-robotPlant.newRelativeTarget(10, 10)
+# robotPlant.newRelativeTarget(10, 10)
 
 t = timestamp_now ()
 
 btn = ev3.Button()
 
-while (timestamp_now () - t < 60000) and (not btn.backspace):
+while (timestamp_now () - t < 60000) and (not btn.backspace) and (not robotPlant.taskOver()):
     robotPlant.update()
 
 lightReadings = ""
