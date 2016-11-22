@@ -41,7 +41,7 @@ class LineSearcherController(Controller):
         if self.robot.state == RobotState.OFF_LINE:
 
             if self.lineState == LineState.LEFT:
-                targetDegree = self.robot.sensorGyroStartValue + 90
+                targetDegree = self.robot.sensorGyroStartValue + 86
                 print(targetDegree)
                 # aim to the right
                 while True:
@@ -60,7 +60,7 @@ class LineSearcherController(Controller):
                         # self.lineState = LineState.RIGHT
                         break
             elif self.lineState == LineState.RIGHT:
-                targetDegree = self.robot.sensorGyroStartValue - 90
+                targetDegree = self.robot.sensorGyroStartValue - 86
                 print(targetDegree)
                 # aim to the right
                 while True:
@@ -90,7 +90,7 @@ class LineSearcherController(Controller):
             self.robot.setState(RobotState.LINE_SEARCH)
             self.previousLightVal = self.robot.getLightValue()
 
-        elif self.robot.state == RobotState.LINE_SEARCH or self.robot.state == RobotState.OBSTACLE_TRACE:
+        elif self.robot.state == RobotState.LINE_SEARCH:
 
             # check for drastic change in light
             # print(abs(self.previousLightVal - self.robot.getLightValue()))
@@ -101,7 +101,7 @@ class LineSearcherController(Controller):
                 # print('FOUND NEW LINE')
                 # self.previousLightVal = self.robot.getLightValue()
 
-            if self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.LEFT and (self.previousLightVal - self.robot.getLightValue()) < -3:
+            if self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.LEFT and (self.previousLightVal - self.robot.getLightValue()) < -2:
                 self.robot.setState(RobotState.LINE_FOLLOW)
                 self.robot.motorLeft.stop()
                 self.robot.motorRight.stop()
@@ -137,7 +137,7 @@ class LineSearcherController(Controller):
                         self.numLinesMoved += 1
                         break
 
-            elif self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.RIGHT and (self.previousLightVal - self.robot.getLightValue()) < -3:
+            elif self.robot.getLightValue() < self.robot.LIGHT_MID_VAL and self.lineState == LineState.RIGHT and (self.previousLightVal - self.robot.getLightValue()) < -2:
                 self.robot.setState(RobotState.LINE_FOLLOW)
                 self.robot.motorLeft.stop()
                 self.robot.motorRight.stop()
@@ -177,8 +177,8 @@ class LineSearcherController(Controller):
                 # self.robot.setState(RobotState.LINE_FOLLOW)
 
             else:
-                self.robot.motorLeft.run_timed(duty_cycle_sp=20, time_sp=50)
-                self.robot.motorRight.run_timed(duty_cycle_sp=20, time_sp=50)
+                self.robot.motorLeft.run_timed(duty_cycle_sp=30, time_sp=50)
+                self.robot.motorRight.run_timed(duty_cycle_sp=30, time_sp=50)
 
             self.previousLightVal = self.robot.getLightValue()
 

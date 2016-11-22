@@ -21,7 +21,7 @@ class PlantController_Task_B(PlantController):
 
         btn = ev3.Button()
 
-        while (self.timestamp_now () - t < 60000) and (not btn.backspace) and (not self.taskOver()):
+        while (self.timestamp_now () - t < 70000) and (not btn.backspace) and (not self.taskOver()):
             self.update()
 
     def update(self):
@@ -29,6 +29,6 @@ class PlantController_Task_B(PlantController):
         super(PlantController_Task_B, self).update()
 
         # if the robot has moved between lines 4 times and left the final line, the task is complete
-        if self.line_searchController.numLinesMoved == 4 and self.robot.state == RobotState.OFF_LINE:
+        if self.line_searchController.numLinesMoved == 4 and self.robot.state == RobotState.LINE_FOLLOW:
             print('TASK B COMPLETE!!!')
             self.robot.setState(RobotState.DEAD)

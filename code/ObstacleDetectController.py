@@ -32,6 +32,10 @@ class ObstacleDetectController(Controller):
 
         self.ultraValues = []
 
+        self.hitObjectGyroValue = -1
+
+        self.previousLightVal = -1
+
         # self.scanDirection = ObstacleScanDirection.LEFT
         # self.scanLeftValue = -1
         # self.scanRightValue = -1
@@ -53,6 +57,7 @@ class ObstacleDetectController(Controller):
                 self.robot.setState(RobotState.OBSTACLE_DETECT)
                 self.robot.motorLeft.stop()
                 self.robot.motorRight.stop()
+                self.hitObjectGyroValue = self.robot.getGyroValue();
 
                 # t_start = self.timestamp_now()
                 # # set motor middle to starting value
@@ -74,7 +79,7 @@ class ObstacleDetectController(Controller):
                     self.robot.motorMiddle.run_direct(duty_cycle_sp=driveSpeed)
 
                     if self.robot.getTouchValue():
-                        driveSpeed *= 0.9
+                        driveSpeed *= 0.7
 
                     if driveSpeed < 4:
                         break
@@ -97,6 +102,45 @@ class ObstacleDetectController(Controller):
                 #     # drive in a circle
                 #     self.robot.motorLeft.run_timed(duty_cycle_sp=25, time_sp=50)
                 #     self.robot.motorRight.run_timed(duty_cycle_sp=-25, time_sp=50)
+            if self.previousLightVal - self.robot.getLightValue() < -8:
+                # self.robot.motorLeft.stop()
+                # self.robot.motorRight.stop()
+                # time.sleep(1)
+                # print('FOUND LINE!')
+                # self.robot.setState(RobotState.DEAD)
+                # endGyroVal = self.robot.getGyroValue() + 100
+                # sonarValuesRange = []
+
+                while self.robot.getGyroValue() < self.hitObjectGyroValue:
+                    # drive in a circle
+                    self.robot.motorLeft.run_timed(duty_cycle_sp=40, time_sp=50)
+                    # self.robot.motorRight.run_timed(duty_cycle_sp=-30, time_sp=50)
+                time.sleep(1)
+                # drive forward for a second
+                self.robot.motorLeft.run_timed(duty_cycle_sp=50, time_sp=500)
+                self.robot.motorRight.run_timed(duty_cycle_sp=50, time_sp=500)
+                time.sleep(1)
+
+                self.previousLightVal = self.robot.getLightValue()
+                while self.previousLightVal - self.robot.getLightValue() < 3:
+                    # drive in a circle
+                    self.robot.motorLeft.run_timed(duty_cycle_sp=30, time_sp=50)
+                    self.robot.motorRight.run_timed(duty_cycle_sp=-30, time_sp=50)
+                    self.previousLightVal = self.robot.getLightValue()
+
+                time.sleep(1)
+                self.robot.setState(RobotState.LINE_FOLLOW)
+
+            self.previousLightVal = self.robot.getLightValue()
+
+
+        # elif self.robot.state == RobotState.OBSTACLE_TRACE:
+        #     if self.robot.getLightValue() - self.BLACK_LIGHT_VAL < 5:
+        #         self.robot.motorLeft.stop()
+        #         self.robot.motorRight.stop()
+        #         time.sleep(1)
+        #         print('FOUND LINE!')
+        #         self.robot.setState(RobotState.DEAD)
 
     def scanObject(self):
 
@@ -121,6 +165,7 @@ class ObstacleDetectController(Controller):
         self.OBJECTSCAN_MIN = float(min(sonarValuesRange))
 
         print('min sonar value:{}'.format(self.OBJECTSCAN_MIN))
+        self.previousLightVal = self.robot.getLightValue();
         self.robot.setState(RobotState.OBSTACLE_TRACE)
 
     def traceObject(self):

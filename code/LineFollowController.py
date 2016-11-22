@@ -48,6 +48,10 @@ class LineFollowController(Controller):
 
     def update(self):
 
+        if self.robot.stateChangeOccurred:
+            self.resetPIDs()
+            self.robot.stateChangeOccurred = False
+
         # if the black/white light values have not been set, search for them
         if self.robot.state == RobotState.LINE_COLOUR_EVALUATE: #self.light_target  == -1:
             self.findLightvalues()

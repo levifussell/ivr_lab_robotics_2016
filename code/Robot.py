@@ -21,12 +21,16 @@ class Robot:
         self.sensorLight.mode='COL-REFLECT'
         self.sensorGyro = ev3.GyroSensor(ev3.INPUT_2)
         self.sensorSonar = ev3.UltrasonicSensor(ev3.INPUT_3)
+        # make sure the gyro doesn't overflow and starts at 0
+        self.sensorGyro.mode = 'GYRO-CAL'
         self.sensorGyro.mode = 'GYRO-ANG'
         self.sensorTouch = ev3.TouchSensor(ev3.INPUT_4)
         self.state = RobotState.LINE_COLOUR_EVALUATE
 
         self.motorMiddleStartPosition = self.motorMiddle.position
         self.sensorGyroStartValue = self.sensorGyro.value() + 360
+
+        self.stateChangeOccurred = False
 
         self.LIGHT_BLACK_VAL = -1
         self.LIGHT_WHITE_VAL = -1
@@ -72,3 +76,6 @@ class Robot:
         if self.state != newState:
             # TODO: make the robot declare its new state
             self.state = newState
+            self.stateChangeOccurred = True
+        else:
+            self.stateChangeOccurred = False

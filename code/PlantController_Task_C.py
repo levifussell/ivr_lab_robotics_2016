@@ -21,7 +21,7 @@ class PlantController_Task_C(PlantController):
 
         btn = ev3.Button()
 
-        while (self.timestamp_now () - t < 60000) and (not btn.backspace) and (not self.taskOver()):
+        while (self.timestamp_now () - t < 90000) and (not btn.backspace) and (not self.taskOver()):
             self.update()
 
     def update(self):
