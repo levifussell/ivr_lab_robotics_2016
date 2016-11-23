@@ -22,7 +22,7 @@ class ObstacleDetectController(Controller):
         self.PIDCOntroller_motorSonar = PIDController(k_proportional=4, k_integral=0.05)
 
         # FOR LOG (BEST RUN)
-        self.PIDCOntroller_sonar = PIDController(k_proportional=20.0, k_derivative=0.0)#k_integral=0.01)
+        self.PIDCOntroller_sonar = PIDController(k_proportional=20.0, k_integral=0.0)#k_integral=0.01)
         # self.PIDCOntroller_sonar = PIDController(k_proportional=25, k_integral=0.0005)
         # self.PIDCOntroller_sonar = PIDController(k_proportional=40, k_integral=0.001)
 
