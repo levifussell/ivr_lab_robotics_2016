@@ -69,7 +69,7 @@ class LineFollowController(Controller):
 
             # print('ki: {}'.format(light_error))
 
-            self.positionTracer.append(light_drive)
+            # self.positionTracer.append(light_drive)
             # print(light_drive)
             self.__drive(light_drive)
 
@@ -144,6 +144,12 @@ class LineFollowController(Controller):
         # print the histogram values
         for i in buckets:
             print('{}: {}'.format(i, buckets[i]))
+
+        for i in range(1, 101):
+            if i in buckets.keys():
+                self.positionTracer.append(buckets[i])
+            else:
+                self.positionTracer.append(0)
 
         dWhite = dict(buckets.items()[len(buckets)/2:])
         dBlack = dict(buckets.items()[:len(buckets)/4])
