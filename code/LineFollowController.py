@@ -69,7 +69,7 @@ class LineFollowController(Controller):
 
             # print('ki: {}'.format(light_error))
 
-            # self.positionTracer.append(light_drive)
+            self.positionTracer.append(self.light)
             # print(light_drive)
             self.__drive(light_drive)
 

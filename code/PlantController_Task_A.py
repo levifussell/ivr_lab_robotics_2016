@@ -21,12 +21,12 @@ class PlantController_Task_A(PlantController):
 
         btn = ev3.Button()
 
-        while (self.timestamp_now() - t < 5000) and (not btn.backspace) and (not self.taskOver()):
+        while (self.timestamp_now() - t < 30000) and (not btn.backspace) and (not self.taskOver()):
         # while (self.timestamp_now() - t < 60000) and (not btn.backspace) and (not self.taskOver()):
             self.update()
 
         lightReadings = ""
-        lightReadings_file = open('lightHistogram.txt', 'w')
+        lightReadings_file = open('lightValues.txt', 'w')
 
         for i in range(0, len(self.line_followController.positionTracer)):
             lightReadings += str(self.line_followController.positionTracer[i]) + ','
